@@ -25,7 +25,7 @@ public class MineAndBank extends PollingScript<ClientContext> {
             goBank(); //go banking
 
         }
-        if(ctx.inventory.select().count() != 28){ //if inventory not full
+        else(ctx.inventory.select().count() != 28){ //if inventory not full
             goMine();
 
             if (ctx.players.local().animation() != 625) { //if not mining
@@ -72,7 +72,9 @@ public class MineAndBank extends PollingScript<ClientContext> {
 
         if(ctx.players.local().tile().floor() == 0){
             sleep(1200);
-            ctx.movement.step(mine_tile); //move to mine
+            if(!mine_tile.matrix(ctx).inViewport()){
+                ctx.movement.step(mine_tile); //move to mine
+            } 
         }
     }
 
