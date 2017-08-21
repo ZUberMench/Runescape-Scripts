@@ -10,7 +10,7 @@ import org.powerbot.script.rt4.Item;
 import static org.powerbot.script.Condition.sleep;
 
 @Script.Manifest(name = "First Script!", properties = "author=BMoney; topic=1296203; client=4;", description = "First of the first my guy" )
-public class FirstScript extends PollingScript<ClientContext> {
+public class MineAndDrop extends PollingScript<ClientContext> {
 
 
     @Override
