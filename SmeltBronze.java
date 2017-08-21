@@ -27,7 +27,7 @@ public class SmeltBronze extends PollingScript<ClientContext>
     Tile upstairs_tile = new Tile(3205, 3209); //lumby castle 3rd floor stairs
     Tile smeltroom_tile = new Tile(3227, 3255); //lumby smelter room
 
-    Component smeltingAction = ctx.widgets.component(311, 16);
+    Component smeltingAction = ctx.widgets.component(311, 16); //this component is used to click "Bronze" in the furnace
 
 
     @Override
@@ -38,31 +38,19 @@ public class SmeltBronze extends PollingScript<ClientContext>
         else{
             goBank();
         }
-       /* if(ctx.inventory.select().id(bronzeBar).count() == 10){
-            goBank();
-
-        }
-        if(ctx.inventory.select().id(tinOre).count() > 0 && ctx.inventory.select().id(copperOre).count() > 0 ){
-            goSmelt();
-
-            if (ctx.players.local().animation() != smeltingAnimation) {
-                smelt();
-            }
-        }
-
-*/
     }
-
 
     public void goBank(){
         if(!stairs_tile.matrix(ctx).inViewport()){
             walkToBank.traverse();
+            System.out.println("Traverse has been called");
         }
 
         if(ctx.players.local().tile().floor() == 0) {
             if(ctx.objects.select(15).id(16671).viewable().poll().inViewport()) {
                 sleep(3451);
                 ctx.objects.select(15).nearest().id(16671).poll().interact("climb-up");
+                System.out.println("The stairs are trying to be clicked. This is the line it crashes at.");
                 sleep(1235);
             }
         }
@@ -76,7 +64,6 @@ public class SmeltBronze extends PollingScript<ClientContext>
             ctx.movement.step(bank_tile); //move to the center of the bank in castle
             bank();
         }
-
     }
 
     public void goSmelt(){
@@ -98,25 +85,24 @@ public class SmeltBronze extends PollingScript<ClientContext>
                 walkToSmelter.traverse();
             }
             else{
-                //ctx.movement.step(smeltroom_tile);
                 smelt();
             }
-
         }
     }
 
     public void smelt(){
         ctx.objects.select(15).id(smelter).nearest().poll().interact("Smelt");
-        sleep(1240);
+        sleep(1427);
         smeltingAction.interact("Bronze");
+        sleep(1355);
     }
 
     public void bank(){
         if(bank_tile.matrix(ctx).inViewport()){
                 ctx.bank.open();
-                ctx.bank.deposit(bronzeBar, 10); //id, amount
-                ctx.bank.withdraw(copperOre, 10);
-                ctx.bank.withdraw(tinOre, 10);
+                ctx.bank.deposit(bronzeBar, 14); //id, amount
+                ctx.bank.withdraw(copperOre, 14);
+                ctx.bank.withdraw(tinOre, 14);
         }
         else{
             ctx.movement.step(bank_tile);
