@@ -60,8 +60,11 @@ public class SmeltBronze extends PollingScript<ClientContext>
         }
 
         if(ctx.players.local().tile().floor() == 0) {
-            ctx.objects.select(10).nearest().id(16671).poll().interact("climb-up");
-            sleep(1235);
+            if(ctx.objects.select(15).id(16671).viewable().poll().inViewport()) {
+                sleep(3451);
+                ctx.objects.select(15).nearest().id(16671).poll().interact("climb-up");
+                sleep(1235);
+            }
         }
 
         if(ctx.players.local().tile().floor() == 1){
@@ -72,9 +75,6 @@ public class SmeltBronze extends PollingScript<ClientContext>
         if(ctx.players.local().tile().floor() == 2){
             ctx.movement.step(bank_tile); //move to the center of the bank in castle
             bank();
-            //ctx.bank.open();
-            //sleep(1785);
-            //ctx.bank.deposit(bronzeBar, 10); //id, amount
         }
 
     }
@@ -98,7 +98,7 @@ public class SmeltBronze extends PollingScript<ClientContext>
                 walkToSmelter.traverse();
             }
             else{
-                ctx.movement.step(smeltroom_tile);
+                //ctx.movement.step(smeltroom_tile);
                 smelt();
             }
 
@@ -106,16 +106,9 @@ public class SmeltBronze extends PollingScript<ClientContext>
     }
 
     public void smelt(){
-       // ctx.inventory.select().id(copperOre).poll().interact("Use");
-       // ctx.objects.select(10).id(smelter).poll().click();
-        ctx.objects.select(10).id(smelter).nearest().poll().interact("Smelt");
-        //ctx.objects.select(10).id(smelter).nearest().poll().click("Bronze");
+        ctx.objects.select(15).id(smelter).nearest().poll().interact("Smelt");
         sleep(1240);
-        //ctx.widgets.component(162, 16);
         smeltingAction.interact("Bronze");
-        //ctx.objects.select(10).id(smelter).nearest().poll().interact("Smelt");
-        //ctx.objects.select(10).id(smelter).nearest().poll().interact("Bronze");
-
     }
 
     public void bank(){
