@@ -24,16 +24,16 @@ public class MineAndBank extends PollingScript<ClientContext> {
     int copperOre = 436;
     int tinOre = 438;
     int depositAll = -1;
+    int firstFloorStairs = 16671; //first floor of lumby castle stairs id
+
 
 
     @Override
     public void poll() {
-
         Random rand = new Random();
 
         if (ctx.inventory.select().count() == 28) {
             goBank(); //go banking
-            mineCount++;
         }
         else{ //if inventory not full
             goMine();
@@ -47,18 +47,29 @@ public class MineAndBank extends PollingScript<ClientContext> {
         if(rand.nextInt(1,100) == 1){
             ctx.camera.angle(rand.nextInt(0, 359));
             ctx.camera.pitch(rand.nextInt(0, 100));
+            System.out.println("The camera moved randomly");
         }
     }
 
     //Method for going to the bank
     public void goBank(){
-        if(!stairs_tile.matrix(ctx).inViewport()){
-            walkToBank.traverse();
-        }
+        GameObject stairs = ctx.objects.select(10).id(firstFloorStairs).nearest().poll();
 
         if(ctx.players.local().tile().floor() == 0) {
-            ctx.objects.select(3).nearest().id(16671).poll().interact("climb-up");
-            sleep(1235);
+
+            if(stairs.valid() && stairs.inViewport()) {
+                ctx.camera.turnTo(stairs_tile);
+                ctx.objects.select(5).nearest().id(firstFloorStairs).poll().interact("climb-up");
+                System.out.println("New stairs method successfully called");
+                sleep(1214);
+                mineCount++;
+                System.out.println(mineCount);
+            }
+            else{
+                walkToBank.traverse();
+                System.out.println("New traverse method being called");
+                sleep(1235);
+            }
         }
 
         if(ctx.players.local().tile().floor() == 1){
@@ -94,7 +105,12 @@ public class MineAndBank extends PollingScript<ClientContext> {
             sleep(1200);
             if(!mine_tile.matrix(ctx).inViewport()){
                 walkToMine.traverse(); //this will take the player on a path to get to the mine
+                System.out.println("The mine tile is not in the viewport, traversing");
             }
+            else{
+                System.out.println("The mine tile is in the viewport");
+            }
+
 
         }
     }
