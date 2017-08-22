@@ -1,6 +1,7 @@
 package scripts;
 //import org.powerbot.script.Condition;
 import org.powerbot.script.PollingScript;
+import org.powerbot.script.Random;
 import org.powerbot.script.Script;
 import org.powerbot.script.Tile;
 import org.powerbot.script.rt4.*;
@@ -28,6 +29,8 @@ public class MineAndBank extends PollingScript<ClientContext> {
     @Override
     public void poll() {
 
+        Random rand = new Random();
+
         if (ctx.inventory.select().count() == 28) {
             goBank(); //go banking
             mineCount++;
@@ -35,10 +38,15 @@ public class MineAndBank extends PollingScript<ClientContext> {
         else{ //if inventory not full
             goMine();
 
-            if (ctx.players.local().animation() != 625) { //if not mining
+            if (ctx.players.local().animation() != 629) { //if not mining
                 mine();
                 sleep(1000);
             }
+        }
+
+        if(rand.nextInt(1,100) == 1){
+            ctx.camera.angle(rand.nextInt(0, 359));
+            ctx.camera.pitch(rand.nextInt(0, 100));
         }
     }
 
@@ -95,11 +103,11 @@ public class MineAndBank extends PollingScript<ClientContext> {
         if(mineCount >= 2){ //once it increments to 2, it resets, so it mines both ores.
             mineCount = 0;
         }
-        if(mineCount == 0){ //mine tin
+        if(mineCount == 1){ //mine tin
             ctx.objects.select(10).id(7485, 7486).nearest().poll().interact("mine"); //select arg is 10 tiles, copper rock id.
         }
         else{ //mine copper
-            ctx.objects.select(10).id(7484, 7453, 7469).nearest().poll().interact("mine"); //select arg is 10 tiles
+            ctx.objects.select(10).id(7484, 7453).nearest().poll().interact("mine"); //select arg is 10 tiles
         }
         System.out.println(mineCount);
     }
