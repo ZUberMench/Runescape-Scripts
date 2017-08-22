@@ -1,8 +1,7 @@
 package scripts;
-import org.powerbot.script.PollingScript;
-import org.powerbot.script.Script;
-import org.powerbot.script.Tile;
+import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
+import org.powerbot.script.rt4.ClientContext;
 
 import static org.powerbot.script.Condition.sleep;
 
@@ -21,6 +20,7 @@ public class SmeltBronze extends PollingScript<ClientContext>
     int copperOre = 436;
     int tinOre = 438;
     int smelter = 24009;
+    int firstFloorStairs = 16671; //first floor of lumby castle stairs id
 
     Tile stairs_tile = new Tile(3205, 3209); //lumby castle first floor stairs
     Tile bank_tile = new Tile(3209, 3220); //bank location
@@ -30,30 +30,53 @@ public class SmeltBronze extends PollingScript<ClientContext>
     Component smeltingAction = ctx.widgets.component(311, 16); //this component is used to click "Bronze" in the furnace
 
 
+
     @Override
     public void poll() {
+        Random rand = new Random();
+
         if(ctx.inventory.select().id(tinOre).count() > 0 && ctx.inventory.select().id(copperOre).count() > 0){
             goSmelt();
         }
         else{
             goBank();
         }
+        if(rand.nextInt(1,100) == 1){
+            ctx.camera.angle(rand.nextInt(0, 359));
+            ctx.camera.pitch(rand.nextInt(0, 100));
+            System.out.println("The camera moved randomly");
+        }
     }
 
     public void goBank(){
-        if(!stairs_tile.matrix(ctx).inViewport()){
-            walkToBank.traverse();
-            System.out.println("Traverse has been called");
-        }
+        GameObject stairs = ctx.objects.select(10).id(firstFloorStairs).nearest().poll();
 
         if(ctx.players.local().tile().floor() == 0) {
-            if(ctx.objects.select(15).id(16671).viewable().poll().inViewport()) {
-                sleep(3451);
-                ctx.objects.select(15).nearest().id(16671).poll().interact("climb-up");
-                System.out.println("The stairs are trying to be clicked. This is the line it crashes at.");
+
+            if(stairs.valid() && stairs.inViewport()) {
+                ctx.camera.turnTo(stairs_tile);
+                ctx.objects.select(5).nearest().id(firstFloorStairs).poll().interact("climb-up");
+                System.out.println("New stairs method succesfully called");
+                sleep(1214);
+            }
+            else{
+                walkToBank.traverse();
+                System.out.println("New traverse method being called");
                 sleep(1235);
             }
         }
+
+        //DEBUGGING CHECK
+        if(stairs_tile.matrix(ctx).inViewport()){
+            System.out.println("The stairs tile is in the viewport");
+        }
+
+        //DEBUGGING CHECK
+        if(ctx.objects.select(10).id(16671).viewable().poll().inViewport()){
+            System.out.println("The stairs are viewable");
+        }
+
+
 
         if(ctx.players.local().tile().floor() == 1){
             ctx.objects.select(3).nearest().id(16672).poll().interact("climb-up");
@@ -67,6 +90,8 @@ public class SmeltBronze extends PollingScript<ClientContext>
     }
 
     public void goSmelt(){
+        GameObject furnace = ctx.objects.select(10).id(smelter).nearest().poll();
+
         if(ctx.players.local().tile().floor() == 2){
             ctx.movement.step(upstairs_tile);
             ctx.objects.select(10).id(16673).nearest().poll().interact("Climb-down");
@@ -79,13 +104,17 @@ public class SmeltBronze extends PollingScript<ClientContext>
             sleep(1200);
         }
 
-        if(ctx.players.local().tile().floor() == 0){
+        if(ctx.players.local().tile().floor() == 0) {
             sleep(1200);
-            if(!smeltroom_tile.matrix(ctx).inViewport()){
+            if (!smeltroom_tile.matrix(ctx).inViewport()) {
                 walkToSmelter.traverse();
-            }
-            else{
+            } else {
+                //ctx.camera.turnTo(smeltroom_tile);
                 smelt();
+            }
+
+            if (furnace.valid()) {
+                ctx.camera.turnTo(furnace);
             }
         }
     }
@@ -99,10 +128,10 @@ public class SmeltBronze extends PollingScript<ClientContext>
 
     public void bank(){
         if(bank_tile.matrix(ctx).inViewport()){
-                ctx.bank.open();
-                ctx.bank.deposit(bronzeBar, 14); //id, amount
-                ctx.bank.withdraw(copperOre, 14);
-                ctx.bank.withdraw(tinOre, 14);
+            ctx.bank.open();
+            ctx.bank.deposit(bronzeBar, 14); //id, amount
+            ctx.bank.withdraw(copperOre, 14);
+            ctx.bank.withdraw(tinOre, 14);
         }
         else{
             ctx.movement.step(bank_tile);
