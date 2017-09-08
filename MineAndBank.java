@@ -1,5 +1,4 @@
 package scripts;
-//import org.powerbot.script.Condition;
 import org.powerbot.script.PollingScript;
 import org.powerbot.script.Random;
 import org.powerbot.script.Script;
@@ -25,6 +24,7 @@ public class MineAndBank extends PollingScript<ClientContext> {
     int tinOre = 438;
     int depositAll = -1;
     int firstFloorStairs = 16671; //first floor of lumby castle stairs id
+    int[] miningAnimationIds = {625, 628, 629};
 
 
 
@@ -38,7 +38,7 @@ public class MineAndBank extends PollingScript<ClientContext> {
         else{ //if inventory not full
             goMine();
 
-            if (ctx.players.local().animation() != 629) { //if not mining
+            if (ctx.players.local().animation() != 628) { //if not mining
                 mine();
                 sleep(1000);
             }
@@ -116,10 +116,10 @@ public class MineAndBank extends PollingScript<ClientContext> {
     }
 
     public void mine(){
-        if(mineCount >= 2){ //once it increments to 2, it resets, so it mines both ores.
+        if(mineCount >= 10){ //once it increments to 2, it resets, so it mines both ores.
             mineCount = 0;
         }
-        if(mineCount == 1){ //mine tin
+        if(mineCount < 5){ //mine tin
             ctx.objects.select(10).id(7485, 7486).nearest().poll().interact("mine"); //select arg is 10 tiles, copper rock id.
         }
         else{ //mine copper
